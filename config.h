@@ -13,10 +13,15 @@
 #define FILE_NOT_OPENED_ERROR "!!! File is not opened !!!"
 #define FILE_NOT_WRITE_ERROR "!!! Data cannot be written to file !!!"
 #define FILE_NOT_READ_ERROR "!!! Data cannot be read from file !!!"
+#define FILE_LSEEK_ERROR "!!! Lseek error !!!+"
 
 #define ENTER_CORRECT_CHOICE "Enter Correct Choice"
 
 #define USER_FOUND_PROMPT "Congratulations!!! User Found"
+#define USER_ACTIVATED "Congratulations!!! User is activated"
+#define USER_ALREADY_ACTIVATED "!!! User is already activated !!!"
+#define USER_DEACTIVATED "Congratulations!!! User is deactivated"
+#define USER_ALREADY_DEACTIVATED "!!! User is already deactivated !!!"
 
 #define MODIFY_PANEL "What do you wish to modify?\n1. Roll No\n2. Name\n3. Login Id\n4. Gender\n"
 #define MODIFY_ROLLNO_PROMPT "Enter the new Roll No: \n"

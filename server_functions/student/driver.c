@@ -17,5 +17,9 @@ void main()
 
     int x = viewAllStudents();
 
-    int y = modifyStudent("MT2023194");
+    // int y = modifyStudent("MT2023192");
+
+    // int z = deactivateStudent("MT2023002");
+    // int z = activateStudent("MT2023002");
+
 }

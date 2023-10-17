@@ -54,17 +54,16 @@ int viewAllStudents()
 int modifyStudent(char rollNo[])
 {
     struct Student stud;
-    int studentFD = open(STUDENT_FILE, O_RDONLY | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR);
+    int studentFD = open(STUDENT_FILE, O_RDWR , S_IRUSR | S_IWUSR);
     if(studentFD == -1)
     {
         perror(FILE_NOT_OPENED_ERROR);
         return -1;
     }
     ssize_t readBytes;
-
-    while(readBytes = read(studentFD, &stud, sizeof(struct Student))>0)
+    off_t offset2 = 0;
+    while((readBytes = read(studentFD, &stud, sizeof(struct Student)))>0)
     {
-        // fjasoidjf
         if(strcmp(stud.rollNo, rollNo)==0)
         {
             printf(USER_FOUND_PROMPT);
@@ -99,7 +98,7 @@ int modifyStudent(char rollNo[])
                     case 4:
                         printf(MODIFY_GENDER);
                         char newGender;
-                        scanf("%s", &newGender);
+                        scanf(" %c", &newGender);
                         stud.gender = newGender;
                         break;
                     
@@ -113,6 +112,12 @@ int modifyStudent(char rollNo[])
                 if(choice2 == 2)
                     break;
             }
+            off_t offset = -1*sizeof(struct Student);
+            if(lseek(studentFD, offset, SEEK_CUR)==-1)
+            {
+                perror(FILE_LSEEK_ERROR);
+                return -1;
+            };
             ssize_t writeBytes;
             writeBytes = write(studentFD, &stud, sizeof(stud));
             if(writeBytes == -1)
@@ -120,9 +125,10 @@ int modifyStudent(char rollNo[])
                 perror(FILE_NOT_WRITE_ERROR);
                 return -1;
             }
-
-        break;   
+            break;   
         }
+        offset2 += sizeof(struct Student);
+        printf("%d\n", offset2);
     }
     if(readBytes == -1)
     {
@@ -130,5 +136,106 @@ int modifyStudent(char rollNo[])
         return -1;
     }
     printf(MODIFY_DONE);
+    close(studentFD);
+    return 1;
 }
+
+int activateStudent(char rollNo[])
+{
+    int studentFD = open(STUDENT_FILE, O_RDWR, S_IRUSR | S_IWUSR);
+    if(studentFD == -1)
+    {
+        perror(FILE_NOT_OPENED_ERROR);
+        return -1;
+    }
+
+    struct Student stud;
+    ssize_t readBytes;
+    while((readBytes = read(studentFD, &stud, sizeof(struct Student)) > 0))
+    {
+        if(strcmp(stud.rollNo, rollNo)==0)
+        {
+            if(stud.isActive == 0)
+            {
+                stud.isActive = 1;
+                off_t offset = -1*sizeof(struct Student);
+                if(lseek(studentFD, offset, SEEK_CUR)==-1)
+                {
+                    perror(FILE_LSEEK_ERROR);
+                    return -1;
+                }
+                ssize_t writeBytes = write(studentFD, &stud, sizeof(struct Student));
+                if(writeBytes == -1)
+                {
+                    perror(FILE_NOT_WRITE_ERROR);
+                    return -1;
+                }
+                break;
+            }
+            else
+            {
+                printf(USER_ALREADY_ACTIVATED);
+                return -1;
+            }
+
+        }
+    }
+    if(readBytes == -1)
+    {
+        perror(FILE_NOT_READ_ERROR);
+        return -1;
+    }
+    printf(USER_ACTIVATED);
+    return 1;
+}
+
+int deactivateStudent(char rollNo[])
+{
+    int studentFD = open(STUDENT_FILE, O_RDWR, S_IRUSR | S_IWUSR);
+    if(studentFD == -1)
+    {
+        perror(FILE_NOT_OPENED_ERROR);
+        return -1;
+    }
+
+    struct Student stud;
+    ssize_t readBytes;
+    while((readBytes = read(studentFD, &stud, sizeof(struct Student)) > 0))
+    {
+        if(strcmp(stud.rollNo, rollNo)==0)
+        {
+            if(stud.isActive == 1)
+            {
+                stud.isActive = 0;
+                off_t offset = -1*sizeof(struct Student);
+                if(lseek(studentFD, offset, SEEK_CUR)==-1)
+                {
+                    perror(FILE_LSEEK_ERROR);
+                    return -1;
+                }
+                ssize_t writeBytes = write(studentFD, &stud, sizeof(struct Student));
+                if(writeBytes == -1)
+                {
+                    perror(FILE_NOT_WRITE_ERROR);
+                    return -1;
+                }
+                break;
+            }
+            else
+            {
+                printf(USER_ALREADY_DEACTIVATED);
+                return -1;
+            }
+        }
+    }
+    if(readBytes == -1)
+    {
+        perror(FILE_NOT_READ_ERROR);
+        return -1;
+    }
+    printf(USER_DEACTIVATED);
+    close(studentFD);
+    return 1;
+}
+
 #endif
